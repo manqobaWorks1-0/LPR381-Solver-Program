@@ -83,7 +83,7 @@ to be worked on.
 member allocation to be determined
 
 | Member | Focus Area | Responsibilities |
-|---|---|---|---|
+|---|---|---|
 | **1 – Core & Interface** | I/O, UI, error handling | Input file parser, output file writer, canonical form generator, menu-driven console UI, infeasible/unbounded detection & handling, project outline/docs |
 | **2 – Simplex & Cutting Plane** | Primal methods | Primal Simplex, Revised Primal Simplex (Product Form & Price Out), Cutting Plane / Revised Cutting Plane algorithm |
 | **3 – Branch & Bound (LP)** | Integer programming | Branch & Bound Simplex (or Revised), backtracking, sub-problem generation, fathoming, best-candidate reporting |
