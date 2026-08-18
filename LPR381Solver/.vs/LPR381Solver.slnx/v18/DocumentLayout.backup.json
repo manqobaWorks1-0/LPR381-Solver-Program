@@ -1,0 +1,40 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Form1.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\Form1.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Form1.cs [Design]",
+              "RelativeToolTip": "LPR381Solver\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-18T14:37:20.126Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
