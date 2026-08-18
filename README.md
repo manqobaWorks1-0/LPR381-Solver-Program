@@ -82,13 +82,13 @@ to be worked on.
 ## 👥 Team & Work Allocation
 member allocation to be determined
 
-| Member | Focus Area | Responsibilities |
-|---|---|---|
-| **1 – Core & Interface** | I/O, UI, error handling | Input file parser, output file writer, canonical form generator, menu-driven console UI, infeasible/unbounded detection & handling, project outline/docs |
-| **2 – Simplex & Cutting Plane** | Primal methods | Primal Simplex, Revised Primal Simplex (Product Form & Price Out), Cutting Plane / Revised Cutting Plane algorithm |
-| **3 – Branch & Bound (LP)** | Integer programming | Branch & Bound Simplex (or Revised), backtracking, sub-problem generation, fathoming, best-candidate reporting |
-| **4 – Knapsack & Bonus** | Integer programming | Branch & Bound Knapsack algorithm (backtracking, sub-problems, fathoming, best candidate), bonus non-linear solver (f(x)=x²) |
-| **5 – Sensitivity Analysis** | Post-optimality | All sensitivity analysis operations (ranging, apply-change, add activity/constraint), shadow prices, duality (dual model, strong/weak duality) |
+| Member | Roll | Focus Area | Responsibilities |
+|---|---|---|---|
+| Dewald Allers | **1 – Core & Interface** | I/O, UI, error handling | Input file parser, output file writer, canonical form generator, menu-driven console UI, infeasible/unbounded detection & handling, project outline/docs |
+| Tshiamo Maise | **2 – Simplex & Cutting Plane** | Primal methods | Primal Simplex, Revised Primal Simplex (Product Form & Price Out), Cutting Plane / Revised Cutting Plane algorithm |
+| Daluvuyo Magagane | **3 – Branch & Bound (LP)** | Integer programming | Branch & Bound Simplex (or Revised), backtracking, sub-problem generation, fathoming, best-candidate reporting |
+| Manqoba Prosper Siyabonga Mbambo | **4 – Knapsack & Bonus** | Integer programming | Branch & Bound Knapsack algorithm (backtracking, sub-problems, fathoming, best candidate), bonus non-linear solver (f(x)=x²) |
+| Rivan Maritz | **5 – Sensitivity Analysis** | Post-optimality | All sensitivity analysis operations (ranging, apply-change, add activity/constraint), shadow prices, duality (dual model, strong/weak duality) |
 
 **Shared responsibilities (all members):**
 - Code review of one another's modules before merging
