@@ -3,8 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\lpr381solver\\primalsimplex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\primalsimplex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|c:\\users\\rivan\\onedrive\\documents\\university\\lpr381-solver-program\\lpr381solver\\lpr381solver\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}|LPR381Solver\\LPR381Solver.csproj|solutionrelative:lpr381solver\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,18 +35,65 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Form1.cs",
-              "RelativeDocumentMoniker": "LPR381Solver\\Form1.cs",
-              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Form1.cs [Design]",
-              "RelativeToolTip": "LPR381Solver\\Form1.cs [Design]",
+              "Title": "MainForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.Designer.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\MainForm.Designer.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.Designer.cs",
+              "RelativeToolTip": "LPR381Solver\\MainForm.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-18T14:37:20.126Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2026-08-19T12:18:29.633Z",
+              "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Program.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\Program.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\Program.cs",
+              "RelativeToolTip": "LPR381Solver\\Program.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:30:27.42Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\MainForm.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.cs",
+              "RelativeToolTip": "LPR381Solver\\MainForm.cs",
+              "ViewState": "AgIAAM0AAAAAAAAAAAAcwBAAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:35:51.335Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PrimalSimplex.cs",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\PrimalSimplex.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\PrimalSimplex.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\PrimalSimplex.cs",
+              "RelativeToolTip": "LPR381Solver\\PrimalSimplex.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:27:04.981Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainForm.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.cs",
+              "RelativeDocumentMoniker": "LPR381Solver\\MainForm.cs",
+              "ToolTip": "C:\\Users\\rivan\\OneDrive\\Documents\\University\\LPR381-Solver-Program\\LPR381Solver\\LPR381Solver\\MainForm.cs [Design]",
+              "RelativeToolTip": "LPR381Solver\\MainForm.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-19T11:09:17.184Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }
