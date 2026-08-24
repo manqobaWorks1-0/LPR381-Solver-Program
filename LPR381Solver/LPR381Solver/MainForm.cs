@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace LPR381Solver
 
     /// <summary>
     /// All of the below code is AI generated for the sake of testing the sensitivity analysis.
+    /// The 3 new buttons and their click methods at the bottom were added to test
+    /// Primal Simplex, Revised Primal Simplex, and Cutting Plane using the test .txt files.
     /// </summary>
     public class MainForm : Form
     {
@@ -22,6 +25,14 @@ namespace LPR381Solver
         private DataGridView bInverseGrid;
         private DataGridView shadowPriceGrid;
         private Label optimalValueLabel;
+
+        // ---- new buttons for testing Member 2's algorithms ----
+        private Button testPrimalButton;
+        private Button testRevisedButton;
+        private Button testCuttingButton;
+
+        // CHANGE THIS to wherever you saved the test1/test2/test3/test4 .txt files
+        private const string TestFilesFolder = @"C:\Users\T.Maise\Downloads\Test";
 
         private SimplexResult currentResult;
 
@@ -40,6 +51,37 @@ namespace LPR381Solver
                 Height = 30
             };
             runButton.Click += RunButton_Click;
+
+            // ---- new test buttons, placed in a row under the original button ----
+            testPrimalButton = new Button
+            {
+                Text = "Test: Primal Simplex (file)",
+                Left = 10,
+                Top = 610,
+                Width = 220,
+                Height = 30
+            };
+            testPrimalButton.Click += TestPrimalSimplex_Click;
+
+            testRevisedButton = new Button
+            {
+                Text = "Test: Revised Simplex (file)",
+                Left = 240,
+                Top = 610,
+                Width = 220,
+                Height = 30
+            };
+            testRevisedButton.Click += TestRevisedSimplex_Click;
+
+            testCuttingButton = new Button
+            {
+                Text = "Test: Cutting Plane (file)",
+                Left = 470,
+                Top = 610,
+                Width = 220,
+                Height = 30
+            };
+            testCuttingButton.Click += TestCuttingPlane_Click;
 
             iterationSelector = new ComboBox
             {
@@ -108,6 +150,15 @@ namespace LPR381Solver
             Controls.Add(shadowLabel);
             Controls.Add(shadowPriceGrid);
             Controls.Add(optimalValueLabel);
+
+            // ---- add the new test buttons to the form ----
+            Controls.Add(testPrimalButton);
+            Controls.Add(testRevisedButton);
+            Controls.Add(testCuttingButton);
+
+            // the form was only tall enough for the original controls - make it
+            // a bit taller so the new buttons at Top=610 are actually visible
+            Height = 700;
         }
 
         private void RunButton_Click(object sender, EventArgs e)
@@ -145,6 +196,74 @@ namespace LPR381Solver
                 MessageBox.Show($"Error: {ex.Message}", "Solve failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // ================== NEW: test buttons for Member 2's algorithms ==================
+
+        // Loads test2_mixed_relations.txt (has <=, >= and = together) and solves it
+        // with the normal Primal Simplex, then shows the final tableau and Z value.
+        private void TestPrimalSimplex_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string path = Path.Combine(TestFilesFolder, "test2_mixed_relations.txt");
+                var model = TestFileReader.ReadFromFile(path);
+
+                var result = PrimalSimplex.Solve(model.C, model.A, model.B, model.Relations, model.IsMax);
+
+                string tableauText = PrimalSimplex.TableauToString(result.Tableau);
+                string zText = $"Z = {Math.Round(result.GetOptimalValue(), 3)}";
+                MessageBox.Show(tableauText + "\n" + zText, "Primal Simplex test result");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Test failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Loads test1_simple_le.txt (plain <= only) and solves it with Revised
+        // Primal Simplex, showing every iteration's B-inverse in a popup.
+        private void TestRevisedSimplex_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string path = Path.Combine(TestFilesFolder, "test1_simple_le.txt");
+                var model = TestFileReader.ReadFromFile(path);
+
+                using (var writer = new StringWriter())
+                {
+                    RevisedPrimalSimplex.Solve(model.C, model.A, model.B, model.IsMax, writer);
+                    MessageBox.Show(writer.ToString(), "Revised Primal Simplex test result");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Test failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Loads test3_integer_cuttingplane.txt (both variables must be int) and
+        // solves it with Cutting Plane, showing every cut it added along the way.
+        private void TestCuttingPlane_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string path = Path.Combine(TestFilesFolder, "test3_integer_cuttingplane.txt");
+                var model = TestFileReader.ReadFromFile(path);
+
+                using (var writer = new StringWriter())
+                {
+                    CuttingPlane.Solve(model.C, model.A, model.B, model.Relations,
+                        model.SignRestrictions, model.IsMax, writer);
+                    MessageBox.Show(writer.ToString(), "Cutting Plane test result");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Test failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ================== end of new test buttons ==================
 
         private void IterationSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -233,7 +352,7 @@ namespace LPR381Solver
             // 
             // MainForm
             // 
-            this.ClientSize = new System.Drawing.Size(1007, 552);
+            this.ClientSize = new System.Drawing.Size(1007, 660);
             this.Name = "MainForm";
             this.Text = "Main Form";
             this.ResumeLayout(false);
