@@ -1,6 +1,6 @@
 # LPR381 - Linear & Integer Programming Solver
 
-A menu-driven .NET console application (`solve.exe`) that solves Linear Programming (LP) and Integer Programming (IP) models, displays full canonical forms and tableau iterations, and performs sensitivity analysis on the optimal solution.
+A menu-driven .NET WinForms application (`solve.exe`) that solves Linear Programming (LP) and Integer Programming (IP) models, displays full canonical forms and tableau iterations, and performs sensitivity analysis on the optimal solution.
 
 **Module:** Linear Programming 381 (LPR381)
 **Institution:** Belgium Campus iTversity
@@ -67,15 +67,27 @@ bin bin bin bin bin bin
 ---
 
 ## 🛠️ Tech Stack
-- **Language:** C# (.NET) - Visual Studio project
-- **Output:** `solve.exe`, menu-driven console interface
+- **Language:** C# (.NET Framework 4.7.2) - Visual Studio project
+- **Output:** `solve.exe`, menu-driven WinForms interface
 
 ---
 
 ## 📁 Repository Structure
 ```
-to be worked on.
+LPR381Solver/
+├── LPR381Solver/              # Main WinForms solver project
+├── Member1Verification/       # Dependency-free Member 1 checks
+└── LPR381Solver.slnx          # Visual Studio solution
+Examples/                      # Valid sample model files
+CONTRIBUTORS.md                # Individual contribution record
 ```
+
+### Member 1 shared integration contract
+
+- Algorithm modules receive a validated `LinearProgrammingModel` and its `CanonicalForm`.
+- Each algorithm implements `IModelSolver` and returns a `SolverExecution` containing a `SolverRunReport`.
+- Register completed algorithm adapters in `SolverRegistry.CreateDefault()`; no solver should parse input files or write output files directly.
+- The Member 1 workflow owns file selection, validation, canonical display, algorithm selection, error presentation, and output export.
 
 ---
 

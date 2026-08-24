@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Member 1 project integration - Contributor: Dewald Allers -->
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -7,7 +8,7 @@
     <ProjectGuid>{CD169F2B-412B-4ADF-BBA0-2AFB13ED26AF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>LPR381Solver</RootNamespace>
-    <AssemblyName>LPR381Solver</AssemblyName>
+    <AssemblyName>solve</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -46,14 +47,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanonicalFormConverter.cs" />
+    <Compile Include="LinearProgrammingModel.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ModelInputParser.cs" />
+    <Compile Include="ModelOutputWriter.cs" />
     <Compile Include="PrimalSimplex.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="SolverIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
