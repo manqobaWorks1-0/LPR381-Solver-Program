@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,10 @@ namespace LPR381Solver
         public int NumConstraints;
         public double[] CVector;     // original objective coefficients (decision vars only)
         public List<double[,]> Iterations; // snapshot of tableau at every iteration
+
+        // Member 1 integration additions - Contributor: Dewald Allers
+        public string[] DecisionVariableNames;
+        public double OriginalObjectiveValueMultiplier = 1.0;
 
         public double[,] GetBInverse()
         {
@@ -48,6 +53,8 @@ namespace LPR381Solver
         public double GetReducedCost(int colIndex) => Tableau[0, colIndex];
 
         public double GetOptimalValue() => Tableau[0, Tableau.GetLength(1) - 1];
+
+        public double GetOriginalOptimalValue() => GetOptimalValue() * OriginalObjectiveValueMultiplier;
     }
 
     public static class PrimalSimplex
@@ -104,7 +111,7 @@ namespace LPR381Solver
                     }
                 }
                 if (pivotRow == -1)
-                    throw new InvalidOperationException("Model is unbounded.");
+                    throw new UnboundedModelException();
 
                 // Pivot
                 double pivotVal = T[pivotRow, pivotCol];
@@ -144,10 +151,10 @@ namespace LPR381Solver
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
-                    sb.Append(Math.Round(T[i, j], 3).ToString().PadLeft(9));
+                    sb.Append(T[i, j].ToString("0.000", CultureInfo.InvariantCulture).PadLeft(12));
                 sb.AppendLine();
             }
-            sb.AppendLine(new string('-', 9 * cols));
+            sb.AppendLine(new string('-', 12 * cols));
             return sb.ToString();
         }
     }
