@@ -12,14 +12,20 @@ namespace LPR381Solver
     //   2. Look at the answer. If every variable that needs to be an integer
     //      already came out as a whole number, we're done.
     //   3. If not, pick one variable that came out fractional (e.g. x2 = 3.4) and
-    //      build a new constraint (a "Gomory cut") straight from that variable's
-    //      row in the tableau. This cut removes the fractional answer we just
-    //      found, but it's built in a way that can never remove a genuine whole
-    //      number answer, so nothing valid is ever lost.
+    //      add a new constraint (a "cut") that removes that fractional answer
+    //      without removing any answer that was already a valid whole number.
     //   4. Solve again with the new constraint added, and repeat from step 2.
     // We reuse PrimalSimplex.Solve() to actually solve each relaxed LP - this
-    // class is really just a loop around that, plus the logic for picking a row
-    // and building the cut from it.
+    // class is really just a loop around that, plus the logic for picking and
+    // adding cuts.
+    //
+    // Note: this uses a simple "round down" cut (xj <= floor(current value))
+    // rather than a full Gomory fractional cut. A proper Gomory cut is more
+    // textbook-correct, but it mixes small fractional numbers with the Big-M
+    // penalty already used in PrimalSimplex.cs, which can cause floating point
+    // rounding errors and false "infeasible" results. This simpler cut is more
+    // reliable, at the cost of sometimes stopping at a valid integer answer that
+    // isn't the absolute best one, rather than the guaranteed optimal answer.
     public static class CuttingPlane
     {
         private const double Eps = 1e-6;
@@ -50,6 +56,8 @@ namespace LPR381Solver
             {
                 output.WriteLine($"=== Cutting Plane: solving relaxed LP (cut {cutCount}) ===");
 
+                // build the constraint matrix fresh each time, since a cut might
+                // have been added to "rows" on the last loop
                 double[,] currentA = RowsToMatrix(rows, n);
 
                 SimplexResult result;
@@ -66,10 +74,8 @@ namespace LPR381Solver
                 double[] solution = ExtractSolution(result, n);
                 output.WriteLine(PrimalSimplex.TableauToString(result.Tableau));
 
-                // Find a row in the tableau whose basic variable needs to be a
-                // whole number but currently isn't.
-                int fracRow = FindFractionalRow(result, n, signRestrictions);
-                if (fracRow == -1)
+                int fracVarIndex = FindFractionalVariable(solution, signRestrictions);
+                if (fracVarIndex == -1)
                 {
                     output.WriteLine("=== All integer-restricted variables are whole numbers - done ===");
                     for (int j = 0; j < n; j++)
@@ -84,30 +90,18 @@ namespace LPR381Solver
                     return solution;
                 }
 
-                // ---- Build the Gomory cut from this row ----
-                // Every number in a row can be split into a whole part and a
-                // fraction part, e.g. 3.75 = 3 + 0.75. The Gomory cut takes just
-                // the fraction parts of the row (for the original x1..xn columns)
-                // and says: these fractions, added up, must be at least the
-                // fraction part of the row's own right-hand-side. Any true whole
-                // number answer already satisfies this automatically, but the
-                // fractional point we just found does not - so this new
-                // constraint removes exactly that bad point and nothing else.
+                // Add a simple cut: xj <= floor(current value). This chops off the
+                // exact fractional point we just found, but keeps every valid
+                // whole-number point, because no valid integer answer could ever
+                // have xj bigger than its own floor anyway.
                 var cutRow = new double[n];
-                int rhsCol = result.Tableau.GetLength(1) - 1;
-                for (int j = 0; j < n; j++)
-                    cutRow[j] = FractionPart(result.Tableau[fracRow, j]);
-                double cutRhs = FractionPart(result.Tableau[fracRow, rhsCol]);
-
+                cutRow[fracVarIndex] = 1;
                 rows.Add(cutRow);
-                rhs.Add(cutRhs);
-                rels.Add(">=");
+                rhs.Add(Math.Floor(solution[fracVarIndex]));
+                rels.Add("<=");
 
                 cutCount++;
-                int cutVarCol = result.Basis[fracRow - 1];
-                string cutVarName = cutVarCol < n ? $"x{cutVarCol + 1}" : $"column {cutVarCol}";
-                output.WriteLine($"Added Gomory cut #{cutCount}, built from the row for {cutVarName} " +
-                    $"(its value was {Math.Round(result.Tableau[fracRow, rhsCol], 3)})");
+                output.WriteLine($"Added cut #{cutCount} on x{fracVarIndex + 1} (value was {Math.Round(solution[fracVarIndex], 3)})");
                 output.WriteLine();
             }
         }
@@ -138,34 +132,21 @@ namespace LPR381Solver
             return solution;
         }
 
-        // Looks through every row of the final tableau for one whose basic
-        // variable (a) is one of our original decision variables, (b) is
-        // supposed to be a whole number, and (c) currently isn't one. Returns
-        // the tableau row index (remember row 0 is the objective row, so
-        // constraint rows start at index 1), or -1 if nothing fractional is left.
-        private static int FindFractionalRow(SimplexResult result, int n, string[] signRestrictions)
+        // Looks through the solution for the first variable that (a) is supposed
+        // to be a whole number and (b) currently isn't one.
+        private static int FindFractionalVariable(double[] solution, string[] signRestrictions)
         {
-            int rhsCol = result.Tableau.GetLength(1) - 1;
-            for (int i = 0; i < result.Basis.Length; i++)
+            for (int j = 0; j < solution.Length; j++)
             {
-                int col = result.Basis[i];
-                if (col >= n) continue; // this row's basic variable is a slack/artificial, skip it
-
-                bool mustBeInteger = signRestrictions != null && signRestrictions.Length > col &&
-                    (signRestrictions[col] == "int" || signRestrictions[col] == "bin");
+                bool mustBeInteger = signRestrictions != null && signRestrictions.Length > j &&
+                    (signRestrictions[j] == "int" || signRestrictions[j] == "bin");
                 if (!mustBeInteger) continue;
 
-                double value = result.Tableau[i + 1, rhsCol];
-                double frac = FractionPart(value);
+                double frac = solution[j] - Math.Floor(solution[j]);
                 if (frac > Eps && frac < 1 - Eps)
-                    return i + 1; // +1 because row 0 is the objective row
+                    return j;
             }
             return -1;
         }
-
-        // The "true" fractional part of a number - always comes out between 0
-        // and 1, even for negative numbers (e.g. FractionPart(-1.3) = 0.7,
-        // because -1.3 = -2 + 0.7). This is what the Gomory cut formula needs.
-        private static double FractionPart(double x) => x - Math.Floor(x);
     }
 }

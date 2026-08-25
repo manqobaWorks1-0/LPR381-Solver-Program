@@ -31,8 +31,8 @@ namespace LPR381Solver
         private Button testRevisedButton;
         private Button testCuttingButton;
 
-        // CHANGE THIS to wherever you saved the test1/test2/test3/test4 .txt files
-        private const string TestFilesFolder = @"C:\Users\T.Maise\Downloads\Test";
+
+        private static readonly string TestFilesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestFiles");
 
         private SimplexResult currentResult;
 
