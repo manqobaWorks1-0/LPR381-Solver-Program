@@ -3,50 +3,49 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LPR381Solver
 {
-    /// <summary>
-    /// All of the below code was generated with AI and is only here for the testing of Sensitivity analysis.
-    /// </summary>
+    // This class holds the answer once the Primal Simplex has finished solving.
+    // SensitivityAnalysis.cs uses this class too, so I kept the same field names
+    // that were already here, and only added InitialBasis and IsMax on top - these
+    // two extra fields are what make GetBInverse/GetShadowPrices/GetOptimalValue
+    // still work correctly now that a constraint can start with more than one
+    // extra column (for example >= adds a surplus AND an artificial column).
     public class SimplexResult
     {
-        // Final tableau: rows = constraints (+1 objective row at index 0),
-        // columns = original decision vars + slack vars + RHS (last column)
-        public double[,] Tableau;
-        public int[] Basis;          // column index of the basic variable for each constraint row
+        public double[,] Tableau;      // the final tableau after solving
+        public int[] Basis;            // which column is basic in each row, at the end
+        public int[] InitialBasis;     // which column was basic in each row, at the very start
         public int NumOriginalVars;
         public int NumSlacks;
         public int NumConstraints;
-        public double[] CVector;     // original objective coefficients (decision vars only)
-        public List<double[,]> Iterations; // snapshot of tableau at every iteration
-
-        // Member 1 integration additions - Contributor: Dewald Allers
-        public string[] DecisionVariableNames;
-        public double OriginalObjectiveValueMultiplier = 1.0;
+        public double[] CVector;
+        public List<double[,]> Iterations;   // a snapshot of the tableau after every pivot
+        public bool IsMax = true;            // true if we solved this as a "max" problem
+        public string[] DecisionVariableNames;                 // display names for x1, x2, etc.
+        public double OriginalObjectiveValueMultiplier = 1.0;  // 1 for max, -1 for min - flips Z back to the original problem's sign
 
         public double[,] GetBInverse()
         {
-            // B-inverse = the columns of the final tableau that correspond
-            // to where the slack (identity) columns started.
             int rows = NumConstraints;
             double[,] bInv = new double[rows, rows];
             for (int i = 0; i < rows; i++)
             {
-                int slackCol = NumOriginalVars + i;
+                int startCol = InitialBasis[i];
                 for (int r = 0; r < rows; r++)
-                    bInv[r, i] = Tableau[r + 1, slackCol]; // +1 to skip objective row
+                    bInv[r, i] = Tableau[r + 1, startCol];
             }
             return bInv;
         }
 
+        // Shadow prices are the reduced costs of the columns that started as the
+        // identity columns, taken from the final objective row (row 0).
         public double[] GetShadowPrices()
         {
-            // Reduced cost of each slack column in the final objective row
             double[] shadow = new double[NumConstraints];
             for (int i = 0; i < NumConstraints; i++)
-                shadow[i] = Tableau[0, NumOriginalVars + i];
+                shadow[i] = Tableau[0, InitialBasis[i]];
             return shadow;
         }
 
@@ -54,56 +53,139 @@ namespace LPR381Solver
 
         public double GetOptimalValue() => Tableau[0, Tableau.GetLength(1) - 1];
 
+        // Same as GetOptimalValue(), but flips the sign back if the original
+        // problem was a "min" (since we always solve internally as a "max").
         public double GetOriginalOptimalValue() => GetOptimalValue() * OriginalObjectiveValueMultiplier;
     }
 
+    // This solves an LP using the normal (non-revised) Primal Simplex method - one
+    // big table, updated a bit every pivot, until no more improvement is possible.
+    // We use the Big-M method so this one method can handle <=, >= and = constraints
+    // all at once, instead of needing separate code for each relation type.
+    // Big-M works by giving artificial variables (the "fake" variables we add for
+    // >= and = constraints) a huge penalty cost, so simplex naturally tries to push
+    // them out of the basis as fast as possible - if it can't, the model was never
+    // feasible in the first place.
     public static class PrimalSimplex
     {
-        // c: objective coefficients (max c.x), A: constraint matrix (<=), b: RHS (all >= 0)
+        private const double BigM = 1000000; // the "huge penalty" number for artificial variables
+        private const double Eps = 1e-9;
+
+        // Kept this simple version so the existing hardcoded test call in
+        // MainForm.cs keeps working exactly as before - it assumes every
+        // constraint is <= and that the model is a "max" problem.
         public static SimplexResult Solve(double[] c, double[,] A, double[] b)
         {
-            int m = A.GetLength(0); // constraints
-            int n = A.GetLength(1); // decision vars
-            int totalCols = n + m + 1; // decision vars + slacks + RHS
-            int totalRows = m + 1;     // + objective row
+            var relations = Enumerable.Repeat("<=", A.GetLength(0)).ToArray();
+            return Solve(c, A, b, relations, isMax: true);
+        }
+
+        // Full version: also takes the relation for every constraint ("<=", ">="
+        // or "=") and whether the model is max or min.
+        public static SimplexResult Solve(double[] c, double[,] A, double[] b, string[] relations, bool isMax = true)
+        {
+            int m = A.GetLength(0); // number of constraints
+            int n = A.GetLength(1); // number of decision variables
+
+            // Work out how many extra columns we need to add.
+            // <=  needs 1 extra column (a slack variable)
+            // >=  needs 2 extra columns (a surplus variable AND an artificial variable)
+            // =   needs 1 extra column (just an artificial variable)
+            int extraCols = 0;
+            foreach (var rel in relations)
+                extraCols += rel == ">=" ? 2 : 1;
+
+            int totalCols = n + extraCols + 1; // +1 for the RHS column at the end
+            int totalRows = m + 1;             // +1 for the objective row at the top
 
             double[,] T = new double[totalRows, totalCols];
+            int[] initialBasis = new int[m];
+            var artificialCols = new HashSet<int>(); // remember which columns are "fake" ones
 
-            // Objective row (row 0): -c for decision vars, 0 for slacks, 0 RHS
-            for (int j = 0; j < n; j++) T[0, j] = -c[j];
+            // We always maximise internally. If the real problem is "min", we flip
+            // every objective coefficient and maximise that instead - minimising
+            // c.x gives the same answer as maximising -c.x, just with the sign
+            // flipped back at the end (see GetOptimalValue above).
+            double sign = isMax ? 1 : -1;
+            for (int j = 0; j < n; j++)
+                T[0, j] = -sign * c[j];
 
-            // Constraint rows
+            int col = n; // this tracks where the next extra column should go
             for (int i = 0; i < m; i++)
             {
-                for (int j = 0; j < n; j++) T[i + 1, j] = A[i, j];
-                T[i + 1, n + i] = 1.0;          // slack identity column
-                T[i + 1, totalCols - 1] = b[i]; // RHS
+                // copy this constraint's coefficients into the row, and set its
+                // right-hand-side straight away - the Big-M cancellation just
+                // below needs the RHS to already be here, not set afterwards
+                for (int j = 0; j < n; j++)
+                    T[i + 1, j] = A[i, j];
+                T[i + 1, totalCols - 1] = b[i];
+
+                if (relations[i] == "<=")
+                {
+                    // a simple slack variable - it starts basic straight away
+                    T[i + 1, col] = 1;
+                    initialBasis[i] = col;
+                    col++;
+                }
+                else if (relations[i] == ">=")
+                {
+                    // subtract a surplus variable first (not basic)
+                    T[i + 1, col] = -1;
+                    col++;
+
+                    // then add an artificial variable to start the basis with
+                    T[i + 1, col] = 1;
+                    initialBasis[i] = col;
+                    artificialCols.Add(col);
+
+                    // give it the Big-M penalty in the objective row, then cancel
+                    // it back out of that row so the tableau is still in proper
+                    // canonical form for this new basic variable
+                    T[0, col] = BigM;
+                    for (int j = 0; j < totalCols; j++)
+                        T[0, j] -= BigM * T[i + 1, j];
+                    col++;
+                }
+                else // "="
+                {
+                    // only needs an artificial variable, no surplus
+                    T[i + 1, col] = 1;
+                    initialBasis[i] = col;
+                    artificialCols.Add(col);
+
+                    T[0, col] = BigM;
+                    for (int j = 0; j < totalCols; j++)
+                        T[0, j] -= BigM * T[i + 1, j];
+                    col++;
+                }
             }
 
-            int[] basis = Enumerable.Range(n, m).ToArray(); // slacks start basic
-            var iterations = new List<double[,]> { (double[,])T.Clone() };
+            int[] basis = (int[])initialBasis.Clone();
+            var iterations = new List<double[,]> { (double[,])T.Clone() }; // save the starting tableau too
 
-            int guard = 0;
-            while (guard++ < 200)
+            int guard = 0; // just a safety limit so we can never loop forever by accident
+            while (guard++ < 500)
             {
-                // Find entering column: most negative in objective row
+                // Entering variable: pick the most negative value in the objective
+                // row - that column would improve Z the most if it came in.
                 int pivotCol = -1;
-                double mostNeg = -1e-9;
+                double mostNeg = -Eps;
                 for (int j = 0; j < totalCols - 1; j++)
                 {
                     if (T[0, j] < mostNeg) { mostNeg = T[0, j]; pivotCol = j; }
                 }
-                if (pivotCol == -1) break; // optimal
+                if (pivotCol == -1) break; // nothing negative left - we are optimal
 
-                // Ratio test to find leaving row
+                // Leaving variable: the usual ratio test, smallest positive
+                // RHS-divided-by-column-value wins.
                 int pivotRow = -1;
                 double bestRatio = double.PositiveInfinity;
                 for (int i = 1; i < totalRows; i++)
                 {
-                    if (T[i, pivotCol] > 1e-9)
+                    if (T[i, pivotCol] > Eps)
                     {
                         double ratio = T[i, totalCols - 1] / T[i, pivotCol];
-                        if (ratio < bestRatio - 1e-9)
+                        if (ratio < bestRatio - Eps)
                         {
                             bestRatio = ratio;
                             pivotRow = i;
@@ -113,9 +195,10 @@ namespace LPR381Solver
                 if (pivotRow == -1)
                     throw new UnboundedModelException();
 
-                // Pivot
+                // Pivot: turn the pivot column into a proper unit column.
                 double pivotVal = T[pivotRow, pivotCol];
-                for (int j = 0; j < totalCols; j++) T[pivotRow, j] /= pivotVal;
+                for (int j = 0; j < totalCols; j++)
+                    T[pivotRow, j] /= pivotVal;
 
                 for (int i = 0; i < totalRows; i++)
                 {
@@ -127,22 +210,34 @@ namespace LPR381Solver
                 }
 
                 basis[pivotRow - 1] = pivotCol;
-                iterations.Add((double[,])T.Clone());
+                iterations.Add((double[,])T.Clone()); // save a snapshot after every pivot
+            }
+
+            // If an artificial (fake) variable is still stuck in the basis with a
+            // value above zero, that means we could never fully get rid of it -
+            // which means the model was infeasible from the start.
+            for (int i = 0; i < m; i++)
+            {
+                if (artificialCols.Contains(basis[i]) && T[i + 1, totalCols - 1] > 1e-6)
+                    throw new InvalidOperationException("Model is infeasible.");
             }
 
             return new SimplexResult
             {
                 Tableau = T,
                 Basis = basis,
+                InitialBasis = initialBasis,
                 NumOriginalVars = n,
-                NumSlacks = m,
+                NumSlacks = extraCols,
                 NumConstraints = m,
                 CVector = c,
-                Iterations = iterations
+                Iterations = iterations,
+                IsMax = isMax
             };
         }
 
-        // Formats a tableau as a string, for display in a TextBox, log, or console.
+        // Turns a tableau into a plain grid of text, all numbers rounded to 3
+        // decimal places (the brief asks for 3 decimal places everywhere).
         public static string TableauToString(double[,] T)
         {
             var sb = new StringBuilder();
@@ -158,5 +253,4 @@ namespace LPR381Solver
             return sb.ToString();
         }
     }
- 
 }
