@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -22,10 +23,9 @@ namespace LPR381Solver
         public double[] CVector;
         public List<double[,]> Iterations;   // a snapshot of the tableau after every pivot
         public bool IsMax = true;            // true if we solved this as a "max" problem
+        public string[] DecisionVariableNames;                 // display names for x1, x2, etc.
+        public double OriginalObjectiveValueMultiplier = 1.0;  // 1 for max, -1 for min - flips Z back to the original problem's sign
 
-        // B-inverse can be read straight out of the final tableau: it's just the
-        // columns that were the identity columns when we started, read from the
-        // final table. That's why we need to remember InitialBasis.
         public double[,] GetBInverse()
         {
             int rows = NumConstraints;
@@ -51,14 +51,11 @@ namespace LPR381Solver
 
         public double GetReducedCost(int colIndex) => Tableau[0, colIndex];
 
-        // Row 0's RHS holds the Z value directly, but only if we actually maximised.
-        // If the real problem was "min", we secretly solved max(-c.x) instead, so we
-        // have to flip the sign back here to get the real answer.
-        public double GetOptimalValue()
-        {
-            double raw = Tableau[0, Tableau.GetLength(1) - 1];
-            return IsMax ? raw : -raw;
-        }
+        public double GetOptimalValue() => Tableau[0, Tableau.GetLength(1) - 1];
+
+        // Same as GetOptimalValue(), but flips the sign back if the original
+        // problem was a "min" (since we always solve internally as a "max").
+        public double GetOriginalOptimalValue() => GetOptimalValue() * OriginalObjectiveValueMultiplier;
     }
 
     // This solves an LP using the normal (non-revised) Primal Simplex method - one
@@ -196,7 +193,7 @@ namespace LPR381Solver
                     }
                 }
                 if (pivotRow == -1)
-                    throw new InvalidOperationException("Model is unbounded.");
+                    throw new UnboundedModelException();
 
                 // Pivot: turn the pivot column into a proper unit column.
                 double pivotVal = T[pivotRow, pivotCol];
@@ -249,10 +246,10 @@ namespace LPR381Solver
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
-                    sb.Append(Math.Round(T[i, j], 3).ToString().PadLeft(9));
+                    sb.Append(T[i, j].ToString("0.000", CultureInfo.InvariantCulture).PadLeft(12));
                 sb.AppendLine();
             }
-            sb.AppendLine(new string('-', 9 * cols));
+            sb.AppendLine(new string('-', 12 * cols));
             return sb.ToString();
         }
     }
