@@ -59,6 +59,7 @@
     <Compile Include="ModelOutputWriter.cs" />
     <Compile Include="PrimalSimplex.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="SensitivityAnalysis.cs" />
     <Compile Include="SolverIntegration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
