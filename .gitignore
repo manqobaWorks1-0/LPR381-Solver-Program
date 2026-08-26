@@ -7,3 +7,4 @@
 bin/
 obj/
 *.cache
+/LPR381Solver/LPR381Solver/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
